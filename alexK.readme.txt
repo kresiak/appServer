@@ -1,0 +1,5 @@
+Use version "ws": "3.3.2" de ws
+Sinon on a le problème décrit ici: https://github.com/ionic-team/ionic-cli/issues/2922
+
+events.js:183 throw
+
