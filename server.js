@@ -3,6 +3,7 @@ var isProduction= false
 var MYPORT= isProduction ? 80 : 1337
 var MYHOST= isProduction ? '139.165.57.34': '127.0.0.1'
 
+
 var express = require("express");
 var bodyParser = require("body-parser");
 
@@ -10,9 +11,14 @@ const mailing = require('./mailing')
 const upload = require('./upload')
 const database= require('./database')
 const socket= require('./socket')
-
+const logging= require('./logging')
+logging.configure()
+logging.getLoggerAndConsole().info('Starting giga application server')
 
 var app = express();
+
+app.use(logging.getExpressLogger());
+
 if (isProduction) {
     app.use("/jobs", express.static(__dirname + "/public2"));
     app.use("/krino", express.static(__dirname + "/public3"));
@@ -35,7 +41,7 @@ database.init(() => {
     // when database is ready, do this
     var server = app.listen(MYPORT, MYHOST, function () {
         var port = server.address().port;
-        console.log("App now running on port", port);
+        logging.getLoggerAndConsole().info("App now running on port", port);
     });
 
     socket.init(server)
@@ -64,10 +70,10 @@ app.get('/pictures/:file', upload.handleDownload)
 app.post("/service/:type", handleService)
 
 app.all('*', function (req, res) {
-    console.log("[TRACE] Server 404 request: $ {" + req.originalUrl + "}");
-    if (req.originalUrl.toUpperCase().indexOf("/KRINO/") !== -1) res.status(200).sendFile(__dirname + "/public3/index.html");
-    else if (req.originalUrl.toUpperCase().indexOf("/KRINO2/")!==-1) res.status(200).sendFile(__dirname + "/public4/index.html" );     
-    else res.status(204).end();
+    logging.getLogger().info("[TRACE] Server 404 request: $ {" + req.originalUrl + "}")
+    if (req.originalUrl.toUpperCase().indexOf("/KRINO/") !== -1) res.status(200).sendFile(__dirname + "/public3/index.html")
+    else if (req.originalUrl.toUpperCase().indexOf("/KRINO2/")!==-1) res.status(200).sendFile(__dirname + "/public4/index.html" )
+    else res.status(204).end()
 })
 
 

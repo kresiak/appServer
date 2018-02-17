@@ -1,4 +1,5 @@
-var multer = require('multer');
+var multer = require('multer')
+const logging= require('./logging')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -14,9 +15,10 @@ var uploading = multer({
 }).single('image');
 
 exports.handleUpload= (req, res) => {
-    uploading(req, res, function (err) {
-        console.log(req)
+    uploading(req, res, function (err) {    
         if (err) {
+            logging.getLogger().error('handleUpload error:', err)
+            logging.getLoggerAndConsole().error('handleUpload error')
             res.json({ error_code: 1, err_desc: err });
             return;
         }

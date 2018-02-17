@@ -8,18 +8,20 @@ var dbName= 'giga4'
 
 const mailing = require('./mailing')
 const socket= require('./socket')
+const logging= require('./logging')
 
 var db
 
 function handleError(res, reason, message, code) {
-    console.log("ERROR: " + reason);
+    logging.getLogger().error('reason: ' + reason + '\n' + message)
     res.status(code || 500).json({ "error": message });
 }
 
 exports.init= (fnApplicationInit) => {
     mongodb.MongoClient.connect(connectionUrl, function (err, database) {
         if (err) {
-            console.log(err);
+            logging.getLoggerAndConsole().fatal('Mongo connect not successfull')
+            logging.shutdown()
             process.exit(1);
         }
         
@@ -27,11 +29,10 @@ exports.init= (fnApplicationInit) => {
         db = database.db(dbName)
         
         database.on('close', function () {    // TEST THIS!!!!!!
-            console.log('Error...close');
+            logging.getLoggerAndConsole().fatal('Mongo server is down')
             mailing.ggMailTo('kvasza@gmail.com', 'Mongo server is down', '');
           });	
-        
-        console.log("Database connection ready");
+          logging.getLoggerAndConsole().info('Database connection ready')
         
         // Initialize the app.
         fnApplicationInit()

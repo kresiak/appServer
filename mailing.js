@@ -1,4 +1,5 @@
-var nodemailer = require('nodemailer');
+var nodemailer = require('nodemailer')
+const logging= require('./logging')
 
 var gmailAddress= 'krino.message@gmail.com'
 
@@ -20,9 +21,9 @@ exports.ggMailTo = function(toAddresses, subject, html)  {
 
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            console.log(error);
+            logging.getLoggerAndConsole().error('sendMail error', error);
         } else {
-            console.log('Email sent: ' + info.response);
+            logging.getLoggerAndConsole().info('Email sent: ' , info.response);
         }
     });
 }
