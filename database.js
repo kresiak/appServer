@@ -78,7 +78,7 @@ exports.handlePut = (req, res) => {
     var updateDoc = req.body;
     delete updateDoc._id;
     
-    db.collection(req.params.type).updateOne({ _id: new ObjectID(req.params.id) }, updateDoc, function (err, doc) {
+    db.collection(req.params.type).findOneAndReplace({ _id: new ObjectID(req.params.id) }, updateDoc, function (err, doc) {
         if (err) {
             handleError(res, err.message, "Failed to update " + req.params.type);
         } else {
@@ -93,6 +93,7 @@ exports.handleDelete = (req, res) => {
         if (err) {
             handleError(res, err.message, "Failed to delete " + req.params.type);
         } else {
+            logging.getLoggerAndConsole().info('a deletion has been done on ', req.params.type)
             socket.broadcast({ 'collectionsUpdated' : [req.params.type] })
             res.status(204).end();
         }
@@ -145,6 +146,7 @@ var handleServicePassOrder= (parameter, req, res) => {
                         });
                         res.status(201).json(doc.ops[0]);
                         socket.broadcast({ 'collectionsUpdated' : ['orders','basket'] })
+                        logging.getLoggerAndConsole().info('an order has been passed', doc.ops[0].kid)
                     }
                 });
             });
@@ -171,7 +173,7 @@ var handleServiceUseVoucher= (parameter, req, res) => {
                         total: parameter.amount,
                         equipeId: parameter.equipeId
                     }
-                    db.collection('orders.vouchers').updateOne({ _id: new ObjectID(voucher._id) }, voucher, function (err, voucher2) {
+                    db.collection('orders.vouchers').findOneAndReplace({ _id: new ObjectID(voucher._id) }, voucher, function (err, voucher2) {
                         if (err) {
                             handleError(res, err.message, "Failed to update " + req.params.type);
                         } else {
@@ -179,6 +181,7 @@ var handleServiceUseVoucher= (parameter, req, res) => {
                                 sapId: voucher.sapId
                             });
                             socket.broadcast({ 'collectionsUpdated' : ['orders.vouchers'] })
+                            logging.getLoggerAndConsole().info('a voucher has been used', voucher.sapId)
                         }
                     })
                 }
@@ -199,6 +202,7 @@ var handleServiceCreateVoucher= (parameter, req, res) => {
         if (err) {
             handleError(res, err.message, "Failed to create new " + req.params.type);
         } else {
+            logging.getLoggerAndConsole().info('a voucher has been created', doc.ops[0].sapId)
             db.collection('users.krino').findOne({ _id: new ObjectID(parameter.userId) }, function (err, user) {
                 if (err) {
                     handleError(res, err.message, "Failed to get User");
@@ -213,12 +217,12 @@ var handleServiceCreateVoucher= (parameter, req, res) => {
                         else {
                             request.quantity--
                         }
-                        db.collection('users.krino').updateOne({ _id: new ObjectID(parameter.userId) }, user, function (err, doc2) {
+                        db.collection('users.krino').findOneAndReplace({ _id: new ObjectID(parameter.userId) }, user, function (err, doc2) {
                             if (err) {
                                 handleError(res, err.message, "Failed to update " + req.params.type);
                             } else {
                                 socket.broadcast({'collectionsUpdated' : ['orders.vouchers', 'users.krino']})
-                                res.status(201).json(doc.ops[0]);
+                                res.status(201).json(doc.ops[0]);                                                                
                             }
                         });
                     }
