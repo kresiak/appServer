@@ -28,11 +28,11 @@ exports.ggMailTo = function (toAddresses, subject, html) {
     });
 }
 
-exports.mailLaboDir = (toAddresses, id, test, isProduction, response) => {
+exports.mailLaboDir = (toAddresses, firstName, id, test, isProduction, response) => {
     var url= isProduction ?  `http://139.165.57.34/krino/taskslabd/${id}`  : `http://localhost:4200/taskslabd/${id}`
     
     var html = `
-    <p>Dear All,</p>
+    <p>Dear ${firstName},</p>
     <p>May we hereby ask you for a few minutes of your time.</p>
     <p>We are in the process of updating the database of GIGA members.  You are being contacted as laboratory head (as defined by the director of your thematic unit). We would like you to list the names of the PIs (team leaders) in your laboratory.  Following this, your PIs will each receive a similar request to fill in the members of their respective teams.</p>
     <p>The accompanying link will guide you to a self-explanatory on-line form to be used for that purpose. If you have any questions or encounter problems, please download, install and use the “chrome” browser first.  If still having problems contact Alex Kvasz by email (kvasza@gmail.com).</p>
