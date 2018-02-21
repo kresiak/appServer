@@ -54,6 +54,10 @@ var handleService= (req, res) => {
         mailing.ggMailTo(parameter.data.to, parameter.data.subject, parameter.data.html)
         res.status(201).json('ok')
     }
+    else if (req.params.type === 'ggMailTbLaboDirTo') {
+        mailing.mailLaboDir(parameter.data.to, parameter.data.id, parameter.data.isTest || false, isProduction, res)
+        //res.status(201).json('ok')
+    }
     else {
         database.handleService(req, res)
     }
