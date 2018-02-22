@@ -11,6 +11,16 @@ var transporter = nodemailer.createTransport({
     }
 });
 
+var transporter2 = nodemailer.createTransport({
+    host: 'smtp.ulg.ac.be',
+    port: 587,
+    secure: false,
+    auth: {
+        user: 'admin.giga@uliege.be',
+        pass: 'Patz2745'
+    }
+});
+
 exports.ggMailTo = function (toAddresses, subject, html) {
     var mailOptions = {
         from: gmailAddress,
@@ -66,22 +76,13 @@ exports.mailLaboDir = (toAddresses, firstName, id, test, isProduction, response)
         ]
 
     };
-
-    var transporter = nodemailer.createTransport({
-        host: 'smtp.ulg.ac.be',
-        port: 587,
-        secure: false,
-        auth: {
-            user: 'admin.giga@uliege.be',
-            pass: 'Patz2745'
-        }
-    });
    
     if (test) {
         logging.getLoggerAndConsole().info(toAddresses, `${url}`)
+        response.status(201).json('ok')
     }
     else {
-        transporter.sendMail(mailOptions, function (error, info) {
+        transporter2.sendMail(mailOptions, function (error, info) {
             if (error) {
                 logging.getLoggerAndConsole().error('sendMail error', error);
                 response.status(500).json('bad')
