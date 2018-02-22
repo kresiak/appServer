@@ -45,9 +45,10 @@ exports.mailLaboDir = (toAddresses, firstName, id, test, isProduction, response)
     // 'benoit.ernst@uliege.be'
 
     var mailOptions = {
-        from: gmailAddress,
+        from: 'admin.giga@uliege.be',
         to: toAddresses,
-        subject: 'Teambuilder link for as laboratory head',
+        bcc: 'admin.giga@uliege.be',
+        subject: 'Teambuilder link for you as a laboratory head',
         html: html,
         attachments: [
             {
@@ -66,12 +67,16 @@ exports.mailLaboDir = (toAddresses, firstName, id, test, isProduction, response)
 
     };
 
-/*      var transporter = nodemailer.createTransport({
+    var transporter = nodemailer.createTransport({
         host: 'smtp.ulg.ac.be',
-        port: 25,
-        secure: false
+        port: 587,
+        secure: false,
+        auth: {
+            user: 'admin.giga@uliege.be',
+            pass: 'Patz2745'
+        }
     });
- */   
+   
     if (test) {
         logging.getLoggerAndConsole().info(toAddresses, `${url}`)
     }
