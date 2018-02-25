@@ -15,7 +15,11 @@ const logging= require('./logging')
 logging.configure()
 logging.getLoggerAndConsole().info('Starting giga application server')
 
+var compression = require('compression')
+
 var app = express();
+
+app.use(compression())
 
 app.use(logging.getExpressLogger());
 
