@@ -12,6 +12,7 @@ const socket = require('./socket')
 const logging = require('./logging')
 
 var db
+var collectionMap= new Map()
 
 //var krinoCache
 
@@ -70,11 +71,17 @@ exports.handlePost = (req, res) => {
     newData.createDate = moment().format('DD/MM/YYYY HH:mm:ss');
     res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')    
 
-    db.collection(req.params.type).insertOne(newData, function (err, doc) {
+    var name= req.params.type
+    
+    db.collection(name).insertOne(newData, function (err, doc) {
         if (err) {
-            handleError(res, err.message, "Failed to create new " + req.params.type);
+            handleError(res, err.message, "Failed to create new " + name);
         } else {
-            socket.broadcast({ 'collectionsUpdated': [req.params.type] })
+            if (collectionMap.has(name)) {
+                var docs=collectionMap.get(name)
+                docs.push(doc.ops[0])
+            }
+            socket.broadcast({ 'collectionsUpdated': [name] })
             res.status(201).json(doc.ops[0]);
         }
     });
@@ -84,23 +91,43 @@ exports.handlePut = (req, res) => {
     var updateDoc = req.body;
     delete updateDoc._id;
 
-    db.collection(req.params.type).findOneAndReplace({ _id: new ObjectID(req.params.id) }, updateDoc, function (err, doc) {
+    var name= req.params.type
+    var id= req.params.id    
+
+    db.collection(name).findOneAndReplace({ _id: new ObjectID(id) }, updateDoc, function (err, doc) {
         if (err) {
-            handleError(res, err.message, "Failed to update " + req.params.type);
+            handleError(res, err.message, "Failed to update " + name);
         } else {
-            socket.broadcast({ 'collectionsUpdated': [req.params.type] })
+            if (collectionMap.has(name)) {
+                var docs=collectionMap.get(name)
+                var pos= docs.findIndex(d => d._id.toString()===id)
+                if (pos > -1) {
+                    updateDoc['_id']= new ObjectID(id)
+                    docs[pos]= updateDoc
+                }                    
+            }            
+            socket.broadcast({ 'collectionsUpdated': [name] })
             res.status(204).end();
         }
     });
 }
 
 exports.handleDelete = (req, res) => {
-    db.collection(req.params.type).deleteOne({ _id: new ObjectID(req.params.id) }, function (err, result) {
+    var name= req.params.type
+    var id= req.params.id
+
+    db.collection(name).deleteOne({ _id: new ObjectID(id) }, function (err, result) {
         if (err) {
-            handleError(res, err.message, "Failed to delete " + req.params.type);
+            handleError(res, err.message, "Failed to delete " + name);
         } else {
-            logging.getLoggerAndConsole().info('a deletion has been done on ', req.params.type)
-            socket.broadcast({ 'collectionsUpdated': [req.params.type] })
+            if (collectionMap.has(name)) {
+                var docs=collectionMap.get(name)
+                var pos= docs.findIndex(d => d._id.toString()===id)
+                if (pos > -1) 
+                    docs.splice(pos, 1)                    
+            }            
+            logging.getLoggerAndConsole().info('a deletion has been done on ', name)
+            socket.broadcast({ 'collectionsUpdated': [name] })
             res.status(204).end();
         }
     });
@@ -138,8 +165,6 @@ exports.handleService = (req, res) => {
         default:
     }
 }
-
-var collectionMap= new Map()
 
 var krinoCollections= ['products', 'suppliers', 'categories', 'labos.list', 'otp.product.classifications', 'sap.engage', 'sap.fusion', 'sap.supplier', 'sap.engage.map',
 'users.public', 'products.market', 'platform.enterprises', 'platform.clients', 'currencies',
