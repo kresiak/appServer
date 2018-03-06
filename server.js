@@ -23,7 +23,21 @@ app.use(compression())
 
 app.use(logging.getExpressLogger());
 
+
+
 if (isProduction) {
+    app.use('/krino/task*/:type', (req, res, next) => {
+        var regEx= /(task.+)$/
+        var match = req.baseUrl.match(regEx)
+        if (match && match.length > 1) {
+			logging.getLoggerAndConsole().info("redirecting to ", 'http://139.165.57.34/xenia/' + match[1]);			
+            res.redirect('http://139.165.57.34/xenia/' + match[1])
+        }
+        else {
+            next()
+        }        
+    });    	
+
     app.use("/jobs", express.static(__dirname + "/public2"));
     app.use("/krino", express.static(__dirname + "/public3"));
     app.use("/krino2", express.static(__dirname + "/public4"));
