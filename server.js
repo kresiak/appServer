@@ -82,6 +82,7 @@ app.all('*', function (req, res) {
     logging.getLogger().info("[TRACE] Server 404 request: $ {" + req.originalUrl + "}")
     if (req.originalUrl.toUpperCase().indexOf("/KRINO/") !== -1) res.status(200).sendFile(__dirname + "/public3/index.html")
     else if (req.originalUrl.toUpperCase().indexOf("/KRINO2/")!==-1) res.status(200).sendFile(__dirname + "/public4/index.html" )
+    else if (req.originalUrl.toUpperCase().indexOf("/XENIA/")!==-1) res.status(200).sendFile(__dirname + "/public7/index.html" )
     else res.status(204).end()
 })
 
