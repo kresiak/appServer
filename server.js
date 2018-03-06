@@ -28,6 +28,7 @@ if (isProduction) {
     app.use("/krino", express.static(__dirname + "/public3"));
     app.use("/krino2", express.static(__dirname + "/public4"));
     app.use("/screens", express.static(__dirname + "/public5"));    
+    app.use("/xenia", express.static(__dirname + "/public7"));    
 }
 if (!isProduction) {
     app.use(function (req, res, next) {
