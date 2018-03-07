@@ -167,8 +167,7 @@ exports.handleService = (req, res) => {
 }
 
 var krinoCollections= ['products', 'suppliers', 'categories', 'labos.list', 'otp.product.classifications', 'sap.engage', 'sap.fusion', 'sap.supplier', 'sap.engage.map',
-'users.public', 'products.market', 'platform.enterprises', 'platform.clients', 'currencies',
-'users.giga', 'users.giga.functions', 'users.giga.functions.new', 'users.giga.thematic.units', 'users.giga.teams', 'users.giga.labos', 'basket', 
+'users.public', 'products.market', 'platform.enterprises', 'platform.clients', 'currencies', 'basket', 
 'dashlets', 'equipes', 'equipes.gifts', 'equipes.groups', 'labos', 'messages', 'orders', 'orders.eproc', 'orders.fridge', 'orders.reception', 'orders.log',
 'orders.stock', 'orders.vouchers', 'otps', 'products.stock', 'products.stockage', 'users.krino', 'sap.krino.annotations', 'admin.monitor']
 
